@@ -36,11 +36,16 @@ public class CaseController implements Serializable {
     private List<CaseExecution> activeCaseExecutions;
     // List of enabled caseExecutions
     private List<CaseExecution> enabledCaseExecutions;
+    // List of enabled caseExecutions
+    private List<CaseExecution> availableCaseExecutions;
 
     public CaseController() {
         this.activeCaseExecutions = new ArrayList<>();
         this.enabledCaseExecutions = new ArrayList<>();
+        this.availableCaseExecutions = new ArrayList<>();
     }
+
+    
 
     // Wenn case_instance.xhtml geladen wird (siehe f:metadata
     // Case-Instanz aus dem URL-Parameter laden
@@ -61,6 +66,7 @@ public class CaseController implements Serializable {
         this.caseInstance = null;
         this.activeCaseExecutions.clear();
         this.enabledCaseExecutions.clear();
+        this.availableCaseExecutions.clear();
     }
 
     public void initByCaseInstanceId(final String caseInstanceId) {
@@ -106,7 +112,10 @@ public class CaseController implements Serializable {
                 this.enabledCaseExecutions.add(caseExcecution);
                 List<Task> list = taskService.createTaskQuery().caseExecutionId(executionId).list();
                 int x = 0;
-            } else if (((CaseExecutionEntity) caseExcecution).getCurrentState().toString().equals("completed")) {
+            } else if(caseExcecution.isAvailable()){
+                this.availableCaseExecutions.add(caseExcecution);
+            }
+            else if (((CaseExecutionEntity) caseExcecution).getCurrentState().toString().equals("completed")) {
                 this.enabledCaseExecutions.add(caseExcecution);
             }
         }
@@ -188,6 +197,14 @@ public class CaseController implements Serializable {
 
     public void setEnabledCaseExecutions(List<CaseExecution> enabledCaseExecutions) {
         this.enabledCaseExecutions = enabledCaseExecutions;
+    }
+    
+    public List<CaseExecution> getAvailableCaseExecutions() {
+        return availableCaseExecutions;
+    }
+
+    public void setAvailableCaseExecutions(List<CaseExecution> availableCaseExecutions) {
+        this.availableCaseExecutions = availableCaseExecutions;
     }
 
 }

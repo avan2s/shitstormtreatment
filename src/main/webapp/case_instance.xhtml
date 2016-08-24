@@ -33,15 +33,45 @@ and open the template in the editor.
                                      value="#{caseController.activeCaseExecutions}"
                                      var = "execution">
                             <f:facet name="header">
-                                Active CMMN-Elements (Running)
+                                Active CMMN-Elements
                             </f:facet>
                             <p:column headerText="Name">
                                 <h:outputText value="#{execution.activityName} (#{execution.activityType})" />
                             </p:column>
-                            <p:column headerText="Type" >
+                            <p:column headerText="Actions" >
                                 <h:form>
                                     <p:commandButton value="Select #{execution.activityType}" />
                                 </h:form>
+                            </p:column>
+                        </p:dataTable>
+                        <br/>
+                        <p:dataTable id="tEnabled"
+                                     value="#{caseController.enabledCaseExecutions}"
+                                     var = "execution">
+                            <f:facet name="header">
+                                Enabled CMMN-Elements
+                            </f:facet>
+                            <p:column headerText="Name">
+                                <h:outputText value="#{execution.activityName} (#{execution.activityType})" />
+                            </p:column>
+                            <p:column headerText="Actions" >
+                                <h:form>
+                                    <p:commandButton value="Start #{execution.activityType}" />
+                                </h:form>
+                            </p:column>
+                        </p:dataTable>
+                        <br/>
+                        <p:dataTable id="tAvailable"
+                                     value="#{caseController.availableCaseExecutions}"
+                                     var = "execution">
+                            <f:facet name="header">
+                                Available CMMN-Elements
+                            </f:facet>
+                            <p:column headerText="Name">
+                                <h:outputText value="#{execution.activityName} (#{execution.activityType})" />
+                            </p:column>
+                            <p:column headerText="Actions" >
+                                <h:outputText>No Action Available</h:outputText>
                             </p:column>
                         </p:dataTable>
                     </p:layoutUnit>
