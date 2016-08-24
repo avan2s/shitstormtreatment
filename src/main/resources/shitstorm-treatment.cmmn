@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.2">
+  <cmmn:case id="shitstorm" name="shitstorm">
+    <cmmn:casePlanModel id="CasePlanModel_shitstorm" name="Shitstorm_behandeln">
+      <cmmn:planItem id="Uf" definitionRef="HumanTask_Uf" />
+      <cmmn:planItem id="SMTb" definitionRef="HumanTask_SMTb" />
+      <cmmn:planItem id="Ev" definitionRef="HumanTask_Ev" />
+      <cmmn:planItem id="Ve" definitionRef="HumanTask_Ve">
+        <cmmn:entryCriterion id="EntryCriterion_Ve" sentryRef="Sentry_18p0h0f" />
+      </cmmn:planItem>
+      <cmmn:sentry id="Sentry_18p0h0f">
+        <cmmn:planItemOnPart id="PlanItemOnPart_1iek1un" sourceRef="Uf">        <cmmn:standardEvent>complete</cmmn:standardEvent>
+</cmmn:planItemOnPart>
+        <cmmn:ifPart id="IfPart_0s9kbdo">
+          <cmmn:condition id="Expression_1k9i122"><![CDATA[${vUrsache ne 'unbekannt'}]]></cmmn:condition>
+        </cmmn:ifPart>
+      </cmmn:sentry>
+      <cmmn:humanTask id="HumanTask_Uf" name="Ursache finden" />
+      <cmmn:humanTask id="HumanTask_SMTb" name="SMT beruhigen" />
+      <cmmn:humanTask id="HumanTask_Ev" name="Endgeltliche Entschädigung vollziehen" />
+      <cmmn:humanTask id="HumanTask_Ve" name="Verantwort-lichen entlassen" />
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="M_success">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_shitstorm">
+        <dc:Bounds x="171" y="60" width="367" height="224" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1t10pjl_di" cmmnElementRef="Uf">
+        <dc:Bounds x="202" y="184" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_139b8mw_di" cmmnElementRef="SMTb">
+        <dc:Bounds x="202" y="80" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0xq6c18_di" cmmnElementRef="Ve">
+        <dc:Bounds x="374" y="184" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_0rdnwg2_di" cmmnElementRef="EntryCriterion_Ve">
+        <dc:Bounds x="364" y="209" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="PlanItemOnPart_1iek1un_di" cmmnElementRef="PlanItemOnPart_1iek1un" targetCMMNElementRef="EntryCriterion_Ve" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="302" y="224" />
+        <di:waypoint xsi:type="dc:Point" x="364" y="223" />
+        <cmmndi:CMMNLabel>
+          <dc:Bounds x="293" y="229" width="90" height="20" />
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNShape id="PlanItem_024oi0c_di" cmmnElementRef="Ev">
+        <dc:Bounds x="374" y="80" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

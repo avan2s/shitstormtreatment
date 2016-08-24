@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <ui:composition template="/WEB-INF/templates/template.xhtml">
+        <!--        Content Inhalt ueberschreiben-->
+        <ui:define name="content">
+            <h:body>
+                <h3>Active Cases</h3>
+                <p:dataTable var="caseRow" value="#{caseListController.runningInstances}">
+
+                    <!--                    <p:column headerText="Case Defenition name:">
+                                            <p:link outcome="/faces/case-form.xhtml" value="#{caseRow.caseDefinition.name}">
+                                                <f:param name="caseInstanceId" value="#{caseRow.caseInstance.caseInstanceId}" />
+                                            </p:link>
+                                                                    <a href="case-form.jsf?caseInstanceId=" >#{caseRow.caseDefinition.name}</a>
+                                        </p:column>-->
+
+
+                    <p:column headerText="Case-Instance-ID:">
+                        <p:link outcome="/faces/case_instance.xhtml" value="#{caseRow.caseInstance.caseInstanceId}">
+                            <f:param name="caseInstanceId" value="#{caseRow.caseInstance.caseInstanceId}" />
+                        </p:link>
+                    </p:column>
+
+                    <p:column headerText="Case-Definition-ID:">
+                        <h:outputText value="#{caseRow.caseDefinition.key}" />
+                    </p:column>
+
+                    <p:column headerText="Erfasste Kundenzufriedenheit">
+                        <h:outputText value="#{caseRow.customerSatisfaction}" />
+                    </p:column>
+
+                    <p:column headerText="Erfasste Stakeholder-Power">
+                        <h:outputText value="#{caseRow.stakeholderPower}" />
+                    </p:column>
+
+                    <p:column headerText="Aktuelle Ursache">
+                        <h:outputText value="#{caseRow.reason}" />
+                    </p:column>
+
+                    <p:column headerText="CMMN-File">
+                        <h:outputText value="#{caseRow.caseDefinition.resourceName}" />
+                    </p:column>
+
+                </p:dataTable>
+
+            </h:body>
+        </ui:define>
+    </ui:composition>
+
+</html>
+
