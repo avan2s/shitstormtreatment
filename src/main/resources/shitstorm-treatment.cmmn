@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.2">
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.2">
   <cmmn:case id="shitstorm" name="shitstorm">
     <cmmn:casePlanModel id="CasePlanModel_shitstorm" name="Shitstorm_behandeln">
       <cmmn:planItem id="Uf" definitionRef="HumanTask_Uf" />
       <cmmn:planItem id="SMTb" definitionRef="HumanTask_SMTb" />
       <cmmn:planItem id="Ev" definitionRef="HumanTask_Ev" />
-      <cmmn:planItem id="Ve" definitionRef="HumanTask_Ve">
+      <cmmn:planItem id="Ve" name="Verantwortlichen entlassen" definitionRef="HumanTask_Ve">
         <cmmn:entryCriterion id="EntryCriterion_Ve" sentryRef="Sentry_18p0h0f" />
       </cmmn:planItem>
       <cmmn:sentry id="Sentry_18p0h0f">
@@ -15,10 +15,10 @@
           <cmmn:condition id="Expression_1k9i122"><![CDATA[${vUrsache ne 'unbekannt'}]]></cmmn:condition>
         </cmmn:ifPart>
       </cmmn:sentry>
-      <cmmn:humanTask id="HumanTask_Uf" name="Ursache finden" />
-      <cmmn:humanTask id="HumanTask_SMTb" name="SMT beruhigen" />
-      <cmmn:humanTask id="HumanTask_Ev" name="Endgeltliche Entschädigung vollziehen" />
-      <cmmn:humanTask id="HumanTask_Ve" name="Verantwort-lichen entlassen" />
+      <cmmn:humanTask id="HumanTask_Uf" name="Ursache finden" camunda:assignee="admin" />
+      <cmmn:humanTask id="HumanTask_SMTb" name="SMT beruhigen" camunda:assignee="admin" />
+      <cmmn:humanTask id="HumanTask_Ev" name="Endgeltliche Entschädigung vollziehen" camunda:assignee="admin" />
+      <cmmn:humanTask id="HumanTask_Ve" name="Verantwort-lichen entlassen" camunda:assignee="admin" />
     </cmmn:casePlanModel>
   </cmmn:case>
   <cmmndi:CMMNDI>

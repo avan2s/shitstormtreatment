@@ -40,7 +40,9 @@ and open the template in the editor.
                             </p:column>
                             <p:column headerText="Actions" >
                                 <h:form>
-                                    <p:commandButton value="Select #{execution.activityType}" />
+                                    <p:commandButton action="#{caseController.completeElement(execution)}" 
+                                                     value="Complete #{execution.activityType}" 
+                                                     update="tEnabled tActive tCompleted tAvailable" />
                                 </h:form>
                             </p:column>
                         </p:dataTable>
@@ -56,10 +58,13 @@ and open the template in the editor.
                             </p:column>
                             <p:column headerText="Actions" >
                                 <h:form>
-                                    <p:commandButton value="Start #{execution.activityType}" />
+                                    <p:commandButton action="#{caseController.enableElement(execution)}" 
+                                                     value="Start #{execution.activityType}" 
+                                                     update="tEnabled tActive tCompleted tAvailable"/>
                                 </h:form>
                             </p:column>
                         </p:dataTable>
+
                         <br/>
                         <p:dataTable id="tAvailable"
                                      value="#{caseController.availableCaseExecutions}"
@@ -71,7 +76,21 @@ and open the template in the editor.
                                 <h:outputText value="#{execution.activityName} (#{execution.activityType})" />
                             </p:column>
                             <p:column headerText="Actions" >
-                                <h:outputText>No Action Available</h:outputText>
+                                <h:outputText value="No Action available!" />
+                            </p:column>
+                        </p:dataTable>
+                        <br/>
+                        <p:dataTable id="tCompleted"
+                                     value="#{caseController.completedList}"
+                                     var = "completedElement">
+                            <f:facet name="header">
+                                Completed CMMN-Elements
+                            </f:facet>
+                            <p:column headerText="Name">
+                                <h:outputText value="#{completedElement.caseActivityName} (#{completedElement.caseActivityType})" />
+                            </p:column>
+                            <p:column headerText="Actions" >
+                                <h:outputText value="No Action available!"/>
                             </p:column>
                         </p:dataTable>
                     </p:layoutUnit>
