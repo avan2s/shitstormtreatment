@@ -22,7 +22,14 @@ and open the template in the editor.
                 <f:event type="preRenderView" listener="#{caseController.initCaseByParameters()}" />
             </f:metadata>
             <h:body>
-                <h1>#{caseController.caseDefinition.name}-Instance: #{caseController.caseInstance.caseInstanceId}</h1>
+                <h:panelGrid columns="2">
+                    <h2>#{caseController.caseDefinition.name}-Instance: #{caseController.caseInstance.caseInstanceId}</h2>
+                    <h:form>
+                        <p:commandButton action="#{caseController.goToReommenderForm()}" value="Recommend Action"/>
+                    </h:form>
+                </h:panelGrid>
+
+                <h1></h1>
 
                 <p:layout>
 

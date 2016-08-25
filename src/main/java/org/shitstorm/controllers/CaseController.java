@@ -172,7 +172,7 @@ public class CaseController implements Serializable {
             this.updateElementsStatus();
             this.deselectExecution();
             if (isCasePlanModel) {
-                return Pages.CASE_INSTANCES;
+                return Pages.PAGE_CASE_INSTANCES;
             }
             return Pages.getCaseInstanceURL(this.caseInstance.getId());
         } catch (Exception ex) {
@@ -286,6 +286,10 @@ public class CaseController implements Serializable {
 
     public void setTaskFormVariables(Map<String, Object> taskFormVariables) {
         this.taskFormVariables = taskFormVariables;
+    }
+    
+    public String goToReommenderForm(){
+        return Pages.PAGE_RECOMMENDER_FORM;
     }
 
 }

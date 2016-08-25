@@ -41,7 +41,7 @@ public class UserController implements Serializable {
         if(user == null){
             return null;
         }
-        return Pages.CASE_INSTANCES;
+        return Pages.PAGE_CASE_INSTANCES;
     }
     
     public String logout(){
@@ -51,7 +51,7 @@ public class UserController implements Serializable {
             ((HttpSession)session).invalidate();
         }
         userId = null;
-        return Pages.INDEX;
+        return Pages.PAGE_INDEX;
     }
 
     public String getUserId() {
