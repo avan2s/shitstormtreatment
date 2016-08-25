@@ -15,5 +15,4 @@ public class ApplicationConstants {
     public static final String VAR_URSACHE = "vUrsache";
     public static final String VAR_KUNDENZUFRIEDENHEIT = "vKundenzufriedenheit";
     public static final String VAR_STAKEHOLDER_POWER = "vStakeholderPower";
-    public static final String FORM_FOR_SINGLE_CASE = "case_instance.xhtml";
 }

@@ -29,20 +29,22 @@ and open the template in the editor.
                     <p:layoutUnit id ="centerUnit" 
                                   position="center" 
                                   header="#{caseController.currentCenterFormName}">
+                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
                         <br/>
 
-                        <ui:insert name="recommenderRequestForm">
-
-                        </ui:insert>
                         <h:form rendered="#{caseController.selectedExecution!=null}">
                             <ui:insert name="taskform">
 
                             </ui:insert>
                             <br/>
+                            <br/>
                             <p:commandButton value="Complete #{caseController.selectedExecution.activityType}"
                                              action="#{caseController.completeElement(caseController.selectedExecution)}" 
                                              update="tActive tEnabled tCompleted centerUnit" />
                         </h:form>
+                        <ui:insert name="recommenderRequestForm">
+
+                        </ui:insert>
                     </p:layoutUnit>
 
 

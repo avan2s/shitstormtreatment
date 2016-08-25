@@ -15,7 +15,18 @@ and open the template in the editor.
     </h:head>
     <h:body>
         <ui:composition template="case_instance.xhtml">
-            
+            <!-- Form element is already in template -->
+            <ui:define name="taskform">
+                <p:panelGrid columns="2">
+                    <p:outputLabel for="selectReason" value="Identifizierte Ursache: " />
+                    <p:selectOneMenu id="selectReason" 
+                                     value="#{caseController.taskFormVariables['vUrsache']}" >
+                        <f:selectItem itemValue="sachlich" itemLabel="Sachliche Ursache" />
+                        <f:selectItem itemValue="ethisch" itemLabel="Ethische Ursache" />
+                        <f:selectItem itemValue="unbekannt" itemLabel="Unbekannte Ursache" />
+                    </p:selectOneMenu>
+                </p:panelGrid>
+            </ui:define>
         </ui:composition>
     </h:body>
 </html>

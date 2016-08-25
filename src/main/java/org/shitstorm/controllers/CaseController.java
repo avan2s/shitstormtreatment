@@ -7,9 +7,11 @@ package org.shitstorm.controllers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -19,6 +21,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+import org.shitstorm.constants.ApplicationConstants;
 import org.shitstorm.constants.Pages;
 import org.shitstorm.helper.CaseExecutionHelper;
 
@@ -27,7 +30,7 @@ import org.shitstorm.helper.CaseExecutionHelper;
 public class CaseController implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static final String NO_FORM_MESSAGE = "No Form selected!";
 
     @Inject
@@ -45,13 +48,16 @@ public class CaseController implements Serializable {
     private List<CaseExecution> availableCaseExecutions;
     private List<HistoricCaseActivityInstance> completedList;
 
+    // Alle Variablen in er Prozessinstanz
     private Map<String, Object> variables;
+    private Map<String, Object> taskFormVariables;
 
     public CaseController() {
         this.activeCaseExecutions = new ArrayList<>();
         this.enabledCaseExecutions = new ArrayList<>();
         this.availableCaseExecutions = new ArrayList<>();
         this.completedList = new ArrayList<>();
+        this.taskFormVariables = new HashMap<>();
     }
 
     // Wenn case_instance.xhtml geladen wird (siehe f:metadata
@@ -75,6 +81,7 @@ public class CaseController implements Serializable {
         this.enabledCaseExecutions.clear();
         this.availableCaseExecutions.clear();
         this.completedList.clear();
+        this.taskFormVariables.clear();
         this.currentCenterFormName = NO_FORM_MESSAGE;
     }
 
@@ -101,6 +108,7 @@ public class CaseController implements Serializable {
         // get all historic caseActivityInstances by caseInstanceId
         this.completedList = engine.getHistoryService().createHistoricCaseActivityInstanceQuery()
                 .caseInstanceId(this.caseInstance.getId()).completed().list();
+        this.variables = this.engine.getCaseService().getVariables(caseInstanceId);
 
         // TaskQuery caseInstanceId1 = taskService.createTaskQuery().caseInstanceId(caseInstanceId);
         //int x = 0;
@@ -131,7 +139,7 @@ public class CaseController implements Serializable {
             String activityType = execution.getActivityType();
             this.currentCenterFormName = activityName;
             activityName = activityName.trim().toLowerCase().replaceAll(" ", "_");
-            
+
             if (CaseExecutionHelper.isCasePlanModel(execution)) {
                 return "caseplanmodel_" + activityName;
             } else if (CaseExecutionHelper.isStage(execution)) {
@@ -144,7 +152,7 @@ public class CaseController implements Serializable {
         }
         return currentCaseInstanceURL;
     }
-    
+
     private void deselectExecution() {
         this.selectedExecution = null;
         this.currentCenterFormName = NO_FORM_MESSAGE;
@@ -155,10 +163,41 @@ public class CaseController implements Serializable {
         this.updateElementsStatus();
     }
 
-    public void completeElement(CaseExecution execution) {
-        this.engine.getCaseService().completeCaseExecution(execution.getId());
-        this.updateElementsStatus();
-        this.deselectExecution();
+    public String completeElement(CaseExecution execution) {
+        boolean isCasePlanModel = CaseExecutionHelper.isCasePlanModel(execution);
+
+        try {
+            HashMap<String, Object> savedVariables = this.saveVariables();
+            this.engine.getCaseService().completeCaseExecution(execution.getId(), savedVariables);
+            this.updateElementsStatus();
+            this.deselectExecution();
+            if (isCasePlanModel) {
+                return Pages.CASE_INSTANCES;
+            }
+            return Pages.getCaseInstanceURL(this.caseInstance.getId());
+        } catch (Exception ex) {
+            // Code wenn nicht completable
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", ex.getMessage()));
+            return Pages.getCaseInstanceURL(this.caseInstance.getId());
+        }
+    }
+
+    // save taskform- and Application Variables
+    private HashMap<String, Object> saveVariables() {
+        HashMap<String, Object> influencedVariablesByTask = new HashMap<>();
+
+        // save taskFormValues
+        // with workarround to use boolean variables
+        for (Map.Entry<String, Object> entry : this.taskFormVariables.entrySet()) {
+            if (entry.getValue() != null && ("true".equals(entry.getValue()) || "false".equals(entry.getValue()))) {
+                influencedVariablesByTask.put(entry.getKey(), Boolean.valueOf((String) entry.getValue()));
+            } else {
+                influencedVariablesByTask.put(entry.getKey(), entry.getValue());
+            }
+        }
+        this.engine.getCaseService().setVariables(this.selectedExecution.getId(), influencedVariablesByTask);
+        this.taskFormVariables.clear();
+        return influencedVariablesByTask;
     }
 
     public String getSelectedExecutionName() {
@@ -241,6 +280,12 @@ public class CaseController implements Serializable {
         this.currentCenterFormName = currentCenterFormName;
     }
 
-    
+    public Map<String, Object> getTaskFormVariables() {
+        return taskFormVariables;
+    }
+
+    public void setTaskFormVariables(Map<String, Object> taskFormVariables) {
+        this.taskFormVariables = taskFormVariables;
+    }
 
 }
