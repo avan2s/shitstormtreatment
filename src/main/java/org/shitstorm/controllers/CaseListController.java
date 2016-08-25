@@ -15,7 +15,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.primefaces.util.Constants;
-import org.shitstorm.constants.ApplicationConstant;
+import org.shitstorm.constants.ApplicationConstants;
 import org.shitstorm.model.CaseInformationRow;
 
 /**
@@ -49,11 +49,11 @@ public class CaseListController implements Serializable {
                 // create caseRow with all inforation about instance, definition, variables
                 String caseInstanceId = ci.getId();
                 String customerSatisfaction = (String) this.processEngine.getCaseService()
-                        .getVariable(caseInstanceId, ApplicationConstant.VAR_KUNDENZUFRIEDENHEIT);
+                        .getVariable(caseInstanceId, ApplicationConstants.VAR_KUNDENZUFRIEDENHEIT);
                 String stakeholderPower = (String) this.processEngine.getCaseService()
-                        .getVariable(caseInstanceId, ApplicationConstant.VAR_STAKEHOLDER_POWER);
+                        .getVariable(caseInstanceId, ApplicationConstants.VAR_STAKEHOLDER_POWER);
                 String reason = (String) this.processEngine.getCaseService()
-                        .getVariable(caseInstanceId, ApplicationConstant.VAR_URSACHE);
+                        .getVariable(caseInstanceId, ApplicationConstants.VAR_URSACHE);
                 CaseInformationRow row = new CaseInformationRow(ci, caseDefinition);
                 row.setCustomerSatisfaction(customerSatisfaction);
                 row.setStakeholderPower(stakeholderPower);

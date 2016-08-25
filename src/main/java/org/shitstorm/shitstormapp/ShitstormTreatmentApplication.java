@@ -14,7 +14,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.variable.Variables;
-import org.shitstorm.constants.ApplicationConstant;
+import org.shitstorm.constants.ApplicationConstants;
 
 /**
  *
@@ -26,16 +26,12 @@ public class ShitstormTreatmentApplication extends ServletProcessApplication {
     @PostDeploy
     public void startCaseInstance(ProcessEngine processEngine) {
         CaseService caseService = processEngine.getCaseService();
-        CaseInstance ci = caseService.createCaseInstanceByKey(ApplicationConstant.APPLICATION_ID,
+        CaseInstance ci = caseService.createCaseInstanceByKey(ApplicationConstants.APPLICATION_ID,
                 Variables.createVariables()
-                .putValue(ApplicationConstant.VAR_KUNDENZUFRIEDENHEIT, Variables.stringValue("niedrig"))
-                .putValue(ApplicationConstant.VAR_STAKEHOLDER_POWER, Variables.stringValue("hoch"))
-                .putValue(ApplicationConstant.VAR_URSACHE, Variables.stringValue("unbekannt")));
+                .putValue(ApplicationConstants.VAR_KUNDENZUFRIEDENHEIT, Variables.stringValue("niedrig"))
+                .putValue(ApplicationConstants.VAR_STAKEHOLDER_POWER, Variables.stringValue("hoch"))
+                .putValue(ApplicationConstants.VAR_URSACHE, Variables.stringValue("unbekannt")));
         
-        // Gebe alle Case Excecutions
-        List<CaseExecution> caseExceutions = processEngine.getCaseService()
-                .createCaseExecutionQuery()
-                .caseInstanceId(ci.getId())
-                .list();
+        
     }
 }

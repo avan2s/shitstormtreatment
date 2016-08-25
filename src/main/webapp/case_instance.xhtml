@@ -22,12 +22,30 @@ and open the template in the editor.
                 <f:event type="preRenderView" listener="#{caseController.initCaseByParameters()}" />
             </f:metadata>
             <h:body>
-                <h1>#{caseController.caseInstance.caseInstanceId}</h1>
+                <h1>#{caseController.caseDefinition.name}-Instance: #{caseController.caseInstance.caseInstanceId}</h1>
 
                 <p:layout>
-                    <p:layoutUnit position="center" header="Current Form:" >
-                        Center
+
+                    <p:layoutUnit id ="centerUnit" 
+                                  position="center" 
+                                  header="#{caseController.currentCenterFormName}">
+                        <br/>
+
+                        <ui:insert name="recommenderRequestForm">
+
+                        </ui:insert>
+                        <h:form rendered="#{caseController.selectedExecution!=null}">
+                            <ui:insert name="taskform">
+
+                            </ui:insert>
+                            <br/>
+                            <p:commandButton value="Complete #{caseController.selectedExecution.activityType}"
+                                             action="#{caseController.completeElement(caseController.selectedExecution)}" 
+                                             update="tActive tEnabled tCompleted centerUnit" />
+                        </h:form>
                     </p:layoutUnit>
+
+
                     <p:layoutUnit position="east" resizable="false" size="30%" style="height:100%" >
                         <p:dataTable id="tActive"
                                      value="#{caseController.activeCaseExecutions}"
@@ -40,8 +58,8 @@ and open the template in the editor.
                             </p:column>
                             <p:column headerText="Actions" >
                                 <h:form>
-                                    <p:commandButton action="#{caseController.completeElement(execution)}" 
-                                                     value="Complete #{execution.activityType}" 
+                                    <p:commandButton action="#{caseController.selectExecution(execution)}" 
+                                                     value="Select #{execution.activityType}" 
                                                      update="tEnabled tActive tCompleted tAvailable" />
                                 </h:form>
                             </p:column>

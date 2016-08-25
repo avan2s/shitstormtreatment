@@ -16,6 +16,6 @@ public class Pages {
     public static final String NEW_APPLICATIION = "new-application";
 
     public static String getCaseInstanceURL(String caseInstanceId) {
-        return "case-form.jsf?caseInstanceId=" + caseInstanceId;
+        return ApplicationConstants.FORM_FOR_SINGLE_CASE + "?caseInstanceId=" + caseInstanceId;
     }
 }

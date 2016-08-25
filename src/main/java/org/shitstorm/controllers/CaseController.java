@@ -14,29 +14,29 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
-import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
-import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
 import org.shitstorm.constants.Pages;
+import org.shitstorm.helper.CaseExecutionHelper;
 
 @Named(value = "caseController")
 @SessionScoped
 public class CaseController implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    private static final String NO_FORM_MESSAGE = "No Form selected!";
 
     @Inject
     private ProcessEngine engine;
     private CaseInstance caseInstance;
-    private Task selectedTask;
-    
-    
+    private CaseDefinition caseDefinition;
+    private CaseExecution selectedExecution;
+    private String currentCenterFormName;
+
     // List of active caseExecutions
     private List<CaseExecution> activeCaseExecutions;
     // List of enabled caseExecutions
@@ -44,9 +44,8 @@ public class CaseController implements Serializable {
     // List of enabled caseExecutions
     private List<CaseExecution> availableCaseExecutions;
     private List<HistoricCaseActivityInstance> completedList;
-    
-    private Map<String, Object> variables;
 
+    private Map<String, Object> variables;
 
     public CaseController() {
         this.activeCaseExecutions = new ArrayList<>();
@@ -70,12 +69,13 @@ public class CaseController implements Serializable {
 
     // reset Objects
     private void clear() {
-        this.selectedTask = null;
+        this.selectedExecution = null;
         this.caseInstance = null;
         this.activeCaseExecutions.clear();
         this.enabledCaseExecutions.clear();
         this.availableCaseExecutions.clear();
         this.completedList.clear();
+        this.currentCenterFormName = NO_FORM_MESSAGE;
     }
 
     public void initByCaseInstanceId(final String caseInstanceId) {
@@ -83,20 +83,21 @@ public class CaseController implements Serializable {
         variables = this.engine.getCaseService().getVariables(caseInstanceId);
         this.caseInstance = engine.getCaseService().createCaseInstanceQuery()
                 .caseInstanceId(caseInstanceId).singleResult();
-
+        // get Case Definition from caseInstance by using the repository Service
+        this.caseDefinition = engine.getRepositoryService()
+                .getCaseDefinition(this.caseInstance.getCaseDefinitionId());
         this.updateElementsStatus();
     }
 
     private void updateElementsStatus() {
         String caseInstanceId = this.caseInstance.getId();
-        
+        //List<Task> list = this.engine.getTaskService().createTaskQuery().caseInstanceId(caseInstanceId).list();
         this.availableCaseExecutions = this.engine.getCaseService().createCaseExecutionQuery()
                 .caseInstanceId(caseInstanceId).available().list();
         this.enabledCaseExecutions = this.engine.getCaseService().createCaseExecutionQuery()
                 .caseInstanceId(caseInstanceId).enabled().list();
         this.activeCaseExecutions = this.engine.getCaseService().createCaseExecutionQuery()
                 .caseInstanceId(caseInstanceId).active().list();
-
         // get all historic caseActivityInstances by caseInstanceId
         this.completedList = engine.getHistoryService().createHistoricCaseActivityInstanceQuery()
                 .caseInstanceId(this.caseInstance.getId()).completed().list();
@@ -122,17 +123,31 @@ public class CaseController implements Serializable {
 //        return executions;
 //    }
 // select a task
-    public String selectTask(CaseExecution execution) {
-        List<Task> tasks = engine.getTaskService().createTaskQuery().caseExecutionId(execution.getId()).list();
-        String taskform = Pages.getCaseInstanceURL(this.caseInstance.getId());
-        if (tasks.size() > 0) {
-            this.selectedTask = tasks.get(0);
-            StringBuilder sb = new StringBuilder("task_");
-            sb.append(this.selectedTask.getName().trim().toLowerCase().replaceAll(" ", "_"));
-            taskform = sb.toString();
+    public String selectExecution(CaseExecution execution) {
+        this.selectedExecution = execution;
+        String currentCaseInstanceURL = Pages.getCaseInstanceURL(this.caseInstance.getId());
+        if (this.selectedExecution != null) {
+            String activityName = this.selectedExecution.getActivityName();
+            String activityType = execution.getActivityType();
+            this.currentCenterFormName = activityName;
+            activityName = activityName.trim().toLowerCase().replaceAll(" ", "_");
+            
+            if (CaseExecutionHelper.isCasePlanModel(execution)) {
+                return "caseplanmodel_" + activityName;
+            } else if (CaseExecutionHelper.isStage(execution)) {
+                return ("stage_" + activityName);
+            } else if (CaseExecutionHelper.isTask(execution)) {
+                return ("task_" + activityName);
+            } else {
+                return ("other_" + activityName);
+            }
         }
-
-        return taskform;
+        return currentCaseInstanceURL;
+    }
+    
+    private void deselectExecution() {
+        this.selectedExecution = null;
+        this.currentCenterFormName = NO_FORM_MESSAGE;
     }
 
     public void enableElement(CaseExecution execution) {
@@ -143,28 +158,14 @@ public class CaseController implements Serializable {
     public void completeElement(CaseExecution execution) {
         this.engine.getCaseService().completeCaseExecution(execution.getId());
         this.updateElementsStatus();
+        this.deselectExecution();
     }
 
-    public boolean isProccessTask(CaseExecution execution) {
-        return execution.getActivityType().equals(CmmnModelConstants.CMMN_ELEMENT_PROCESS_TASK);
-    }
-
-    public boolean isTask(CaseExecution execution) {
-        return isHumanTask(execution) || isProccessTask(execution);
-    }
-
-    public boolean isHumanTask(CaseExecution execution) {
-        if (execution == null) {
-            return false;
-        } else {
-            // because complete case is also a HumanTask in Camunda
-            boolean isHumanTask = execution.getActivityType().contentEquals(CmmnModelConstants.CMMN_ELEMENT_HUMAN_TASK);
-            return isHumanTask && !isCasePlanModel(execution);
+    public String getSelectedExecutionName() {
+        if (this.selectedExecution == null) {
+            return NO_FORM_MESSAGE;
         }
-    }
-
-    public boolean isCasePlanModel(CaseExecution execution) {
-        return execution.getActivityType().contentEquals(CmmnModelConstants.CMMN_ELEMENT_CASE_PLAN_MODEL);
+        return this.selectedExecution.getActivityName();
     }
 
     public CaseInstance getCaseInstance() {
@@ -175,12 +176,13 @@ public class CaseController implements Serializable {
         this.caseInstance = caseInstance;
     }
 
-    public Task getSelectedTask() {
-        return selectedTask;
+    public CaseExecution getSelectedExecution() {
+        return selectedExecution;
     }
 
-    public void setSelectedTask(Task selectedTask) {
-        this.selectedTask = selectedTask;
+    public void setSelectedExecution(CaseExecution selectedExecution) {
+        this.selectedExecution = selectedExecution;
+        this.currentCenterFormName = selectedExecution.getActivityName();
     }
 
     public List<CaseExecution> getActiveCaseExecutions() {
@@ -214,5 +216,31 @@ public class CaseController implements Serializable {
     public void setCompletedList(List<HistoricCaseActivityInstance> completedList) {
         this.completedList = completedList;
     }
+
+    public CaseDefinition getCaseDefinition() {
+        return caseDefinition;
+    }
+
+    public void setCaseDefinition(CaseDefinition caseDefinition) {
+        this.caseDefinition = caseDefinition;
+    }
+
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables;
+    }
+
+    public String getCurrentCenterFormName() {
+        return currentCenterFormName;
+    }
+
+    public void setCurrentCenterFormName(String currentCenterFormName) {
+        this.currentCenterFormName = currentCenterFormName;
+    }
+
+    
 
 }
