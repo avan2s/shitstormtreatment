@@ -10,10 +10,45 @@
     <h:body>
         <ui:composition template="case_instance.xhtml">
             <ui:define name="recommenderRequestForm">
+                <h:form>
 
-                <h:outputText value="Identifizierte Ursache: " />
-                <h:outputText value="Identifizierte Ursache: " />
+                    <p:dataTable var="goal" value="#{recommenderController.goals}" 
+                                 tableStyle="width:auto">
+                        <p:column headerText="Goal Figure:">
+                            <h:outputText value="#{goal.goalFigure}" />
+                        </p:column>
 
+                        <p:column headerText="Process-Period-Range">
+                            <h:panelGrid columns="1" style="margin-bottom: 10px">
+                                <h:outputText id="displayRange" value="Between #{recommenderController.minPeriod} and #{recommenderController.maxPeriod}" />
+                                <p:slider minValue="#{recommenderController.minPeriod}" 
+                                          maxValue="#{recommenderController.maxPeriod}" 
+                                          for="txt6,txt7" display="displayRange" 
+                                          style="width: 100%" 
+                                          range="true" 
+                                          displayTemplate="Between {min} and {max}" />
+                            </h:panelGrid>
+                            <h:inputHidden id="txt6" value="#{goal.goalStartPeriod}" />
+                            <h:inputHidden id="txt7" value="#{goal.goalEndPeriod}" />
+                        </p:column>
+
+                        <p:column headerText="GoalValue">
+                            <h:inputText value="#{goal.goalValue}" style="width:100%" />
+                        </p:column>
+
+                        <p:column headerText="Unit">
+                            <h:outputText value="#{goal.goalUnit}" />
+                        </p:column>
+
+                        <p:column headerText="Priority">
+                            <p:knob value="#{goal.priority}">  
+                                <p:ajax listener="#{recommenderController.onChange(goal.priority)}"/>  
+                            </p:knob>
+                        </p:column>
+
+                    </p:dataTable>
+                </h:form>
+                <h:outputText value="hallo" />
             </ui:define>
         </ui:composition>
     </h:body>

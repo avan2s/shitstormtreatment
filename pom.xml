@@ -60,6 +60,8 @@
             <artifactId>primefaces</artifactId>
             <version>6.0</version>
         </dependency>
+        
+        <!-- Dependency For ProcessApplication EJBs -->
 
         
         <!-- Java EE 7 Specification -->

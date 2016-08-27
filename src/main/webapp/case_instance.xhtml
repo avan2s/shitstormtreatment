@@ -25,7 +25,7 @@ and open the template in the editor.
                 <h:panelGrid columns="2">
                     <h2>#{caseController.caseDefinition.name}-Instance: #{caseController.caseInstance.caseInstanceId}</h2>
                     <h:form>
-                        <p:commandButton action="#{caseController.goToReommenderForm()}" value="Recommend Action"/>
+                        <p:commandButton action="#{caseController.goToRecommenderForm()}" value="Recommend Action"/>
                     </h:form>
                 </h:panelGrid>
 
@@ -85,7 +85,7 @@ and open the template in the editor.
                             </p:column>
                             <p:column headerText="Actions" >
                                 <h:form>
-                                    <p:commandButton action="#{caseController.enableElement(execution)}" 
+                                    <p:commandButton action="#{caseController.startExecution(execution)}" 
                                                      value="Start #{execution.activityType}" 
                                                      update="tEnabled tActive tCompleted tAvailable"/>
                                 </h:form>

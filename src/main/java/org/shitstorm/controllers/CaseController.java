@@ -20,8 +20,6 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
-import org.shitstorm.constants.ApplicationConstants;
 import org.shitstorm.constants.Pages;
 import org.shitstorm.helper.CaseExecutionHelper;
 
@@ -32,7 +30,7 @@ public class CaseController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final String NO_FORM_MESSAGE = "No Form selected!";
-
+    
     @Inject
     private ProcessEngine engine;
     private CaseInstance caseInstance;
@@ -98,6 +96,8 @@ public class CaseController implements Serializable {
 
     private void updateElementsStatus() {
         String caseInstanceId = this.caseInstance.getId();
+//        String s = this.extractor.sayHello();
+//        List<CaseExecution> extractEnabledCaseExecutions = this.extractor.extractEnabledCaseExecutions(caseInstanceId);
         //List<Task> list = this.engine.getTaskService().createTaskQuery().caseInstanceId(caseInstanceId).list();
         this.availableCaseExecutions = this.engine.getCaseService().createCaseExecutionQuery()
                 .caseInstanceId(caseInstanceId).available().list();
@@ -105,31 +105,13 @@ public class CaseController implements Serializable {
                 .caseInstanceId(caseInstanceId).enabled().list();
         this.activeCaseExecutions = this.engine.getCaseService().createCaseExecutionQuery()
                 .caseInstanceId(caseInstanceId).active().list();
+        
         // get all historic caseActivityInstances by caseInstanceId
         this.completedList = engine.getHistoryService().createHistoricCaseActivityInstanceQuery()
                 .caseInstanceId(this.caseInstance.getId()).completed().list();
-        this.variables = this.engine.getCaseService().getVariables(caseInstanceId);
-
-        // TaskQuery caseInstanceId1 = taskService.createTaskQuery().caseInstanceId(caseInstanceId);
-        //int x = 0;
-        // arrange order for exceutions
-//        for (CaseExecution caseExcecution : caseExceutions) {
-//            String executionId = caseExcecution.getId();
-//            String activityId = ((CaseExecutionEntity) caseExcecution).getActivityId();
-//            String activityName = caseExcecution.getActivityName();
-//            String activityType = caseExcecution.getActivityType();
-//            
+        this.variables = this.engine.getCaseService().getVariables(caseInstanceId);         
     }
-
-//    public List<CaseExecution> getCompletedMilestones() {
-//        List<CaseExecution> executions = new ArrayList<>();
-//        for (CaseExecution ex : this.completedCaseExecutions) {
-//            if (ex.getActivityType().equals(CmmnModelConstants.CMMN_ELEMENT_MILESTONE)) {
-//                executions.add(ex);
-//            }
-//        }
-//        return executions;
-//    }
+    
 // select a task
     public String selectExecution(CaseExecution execution) {
         this.selectedExecution = execution;
@@ -158,8 +140,9 @@ public class CaseController implements Serializable {
         this.currentCenterFormName = NO_FORM_MESSAGE;
     }
 
-    public void enableElement(CaseExecution execution) {
+    public void startExecution(CaseExecution execution) {
         this.engine.getCaseService().manuallyStartCaseExecution(execution.getId());
+        
         this.updateElementsStatus();
     }
 
@@ -288,7 +271,9 @@ public class CaseController implements Serializable {
         this.taskFormVariables = taskFormVariables;
     }
     
-    public String goToReommenderForm(){
+    public String goToRecommenderForm(){
+        this.selectedExecution = null;
+        this.currentCenterFormName = "Prescriptive Recommender";
         return Pages.PAGE_RECOMMENDER_FORM;
     }
 
