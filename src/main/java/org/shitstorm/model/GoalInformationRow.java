@@ -23,10 +23,11 @@ public class GoalInformationRow implements Serializable {
     public GoalInformationRow() {
     }
 
-    public GoalInformationRow(String goalFigure, double priority, double goalValue, int goalEndPeriod, String unit) {
+    public GoalInformationRow(String goalFigure, double priority, double goalValue, int goalStartPeriod, int goalEndPeriod, String unit) {
         this.goalFigure = goalFigure;
         this.priority = priority;
         this.goalValue = goalValue;
+        this.goalStartPeriod = goalStartPeriod;
         this.goalEndPeriod = goalEndPeriod;
         this.goalUnit = unit;
     }

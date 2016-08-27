@@ -23,16 +23,16 @@ import org.shitstorm.model.GoalInformationRow;
 public class RecommenderController implements Serializable {
 
     private List<GoalInformationRow> goals;
-    private int minPeriod = 0;
-    private int maxPeriod = 4;
+    private final int minPeriod = 0;
+    private final int maxPeriod = 4;
 
     public RecommenderController() {
         this.goals = new ArrayList<>();
-        GoalInformationRow goalK = new GoalInformationRow("Kosten", 0, 0, 0, "Euro");
-        GoalInformationRow goalKZ = new GoalInformationRow("Kundenzufriedenheit", 0, 0, 0, "KZE");
-        GoalInformationRow goalSP = new GoalInformationRow("Stakeholder-Power", 0, 0, 0, "SP");
-        GoalInformationRow goalIG = new GoalInformationRow("Informationsgewinn", 0, 0, 0, "IGE");
-        GoalInformationRow goalZA = new GoalInformationRow("Zeitaufwand", 0, 0, 0, "min");
+        GoalInformationRow goalK = new GoalInformationRow("Kosten", 25, 0, this.minPeriod, this.maxPeriod,"Euro");
+        GoalInformationRow goalKZ = new GoalInformationRow("Kundenzufriedenheit", 25,0, this.minPeriod, this.maxPeriod, "KZE");
+        GoalInformationRow goalSP = new GoalInformationRow("Stakeholder-Power", 25,0, this.minPeriod, this.maxPeriod,"SP");
+        GoalInformationRow goalIG = new GoalInformationRow("Informationsgewinn", 25,0, this.minPeriod, this.maxPeriod, "IGE");
+        GoalInformationRow goalZA = new GoalInformationRow("Zeitaufwand", 25, 0, this.minPeriod, this.maxPeriod, "min");
         this.goals.add(goalK);
         this.goals.add(goalKZ);
         this.goals.add(goalSP);
@@ -56,16 +56,7 @@ public class RecommenderController implements Serializable {
         return minPeriod;
     }
 
-    public void setMinPeriod(int minPeriod) {
-        this.minPeriod = minPeriod;
-    }
-
     public int getMaxPeriod() {
         return maxPeriod;
     }
-
-    public void setMaxPeriod(int maxPeriod) {
-        this.maxPeriod = maxPeriod;
-    }
-
 }

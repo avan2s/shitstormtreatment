@@ -19,7 +19,7 @@
                         </p:column>
 
                         <p:column headerText="Process-Period-Range">
-                            <h:panelGrid columns="1" style="margin-bottom: 10px">
+                            <h:panelGrid columns="1">
                                 <h:outputText id="displayRange" value="Between #{recommenderController.minPeriod} and #{recommenderController.maxPeriod}" />
                                 <p:slider minValue="#{recommenderController.minPeriod}" 
                                           maxValue="#{recommenderController.maxPeriod}" 
@@ -33,17 +33,11 @@
                         </p:column>
 
                         <p:column headerText="GoalValue">
-                            <h:inputText value="#{goal.goalValue}" style="width:100%" />
-                        </p:column>
-
-                        <p:column headerText="Unit">
-                            <h:outputText value="#{goal.goalUnit}" />
+                            <p:spinner id="prefix" value="#{goal.goalValue}" prefix="#{goal.goalUnit}: " min="0" />
                         </p:column>
 
                         <p:column headerText="Priority">
-                            <p:knob value="#{goal.priority}">  
-                                <p:ajax listener="#{recommenderController.onChange(goal.priority)}"/>  
-                            </p:knob>
+                            <p:rating value="5" stars="10" />
                         </p:column>
 
                     </p:dataTable>
