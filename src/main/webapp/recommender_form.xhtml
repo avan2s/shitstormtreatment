@@ -33,16 +33,18 @@
                         </p:column>
 
                         <p:column headerText="GoalValue">
-                            <p:spinner id="prefix" value="#{goal.goalValue}" prefix="#{goal.goalUnit}: " min="0" />
+                            <p:spinner id="prefix" 
+                                       value="#{goal.goalValue}" 
+                                       prefix="#{goal.goalUnit}: " 
+                                       style="width: 100%" min="0" />
                         </p:column>
 
                         <p:column headerText="Priority">
-                            <p:rating value="5" stars="10" />
+                            <p:rating value="5" stars="10" style="width: 100%"/>
                         </p:column>
 
                     </p:dataTable>
                 </h:form>
-                <h:outputText value="hallo" />
             </ui:define>
         </ui:composition>
     </h:body>
