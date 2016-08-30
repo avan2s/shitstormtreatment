@@ -30,7 +30,7 @@ public class CaseController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final String NO_FORM_MESSAGE = "No Form selected!";
-    
+
     @Inject
     private ProcessEngine engine;
     private CaseInstance caseInstance;
@@ -105,13 +105,13 @@ public class CaseController implements Serializable {
                 .caseInstanceId(caseInstanceId).enabled().list();
         this.activeCaseExecutions = this.engine.getCaseService().createCaseExecutionQuery()
                 .caseInstanceId(caseInstanceId).active().list();
-        
+
         // get all historic caseActivityInstances by caseInstanceId
         this.completedList = engine.getHistoryService().createHistoricCaseActivityInstanceQuery()
                 .caseInstanceId(this.caseInstance.getId()).completed().list();
-        this.variables = this.engine.getCaseService().getVariables(caseInstanceId);         
+        this.variables = this.engine.getCaseService().getVariables(caseInstanceId);
     }
-    
+
 // select a task
     public String selectExecution(CaseExecution execution) {
         this.selectedExecution = execution;
@@ -142,7 +142,7 @@ public class CaseController implements Serializable {
 
     public void startExecution(CaseExecution execution) {
         this.engine.getCaseService().manuallyStartCaseExecution(execution.getId());
-        
+
         this.updateElementsStatus();
     }
 
@@ -170,7 +170,7 @@ public class CaseController implements Serializable {
         HashMap<String, Object> influencedVariablesByTask = new HashMap<>();
 
         // save taskFormValues
-        // with workarround to use boolean variables
+        // with workarround to use boolean variables caseFormInput 2 boolean
         for (Map.Entry<String, Object> entry : this.taskFormVariables.entrySet()) {
             if (entry.getValue() != null && ("true".equals(entry.getValue()) || "false".equals(entry.getValue()))) {
                 influencedVariablesByTask.put(entry.getKey(), Boolean.valueOf((String) entry.getValue()));
@@ -270,8 +270,8 @@ public class CaseController implements Serializable {
     public void setTaskFormVariables(Map<String, Object> taskFormVariables) {
         this.taskFormVariables = taskFormVariables;
     }
-    
-    public String goToRecommenderForm(){
+
+    public String goToRecommenderForm() {
         this.selectedExecution = null;
         this.currentCenterFormName = "Prescriptive Recommender";
         return Pages.PAGE_RECOMMENDER_FORM;

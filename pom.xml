@@ -46,7 +46,11 @@
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine-cdi</artifactId>
         </dependency>
-        
+        <dependency>
+            <groupId>org.processapp.utilities</groupId>
+            <artifactId>apputilities</artifactId>
+            <version>0.1</version>
+        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

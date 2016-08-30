@@ -16,6 +16,7 @@ public class Pages {
     public static final String PAGE_RECOMMENDER_FORM = "recommender_form.xhtml";
     public static final String PAGE_NEW_APPLICATIION = "new-application.xhtml";
     public static final String PAGE_CASE_INSTANCE = "case_instance.xhtml";
+    public static final String PAGE_RECOMMENDATION_RESULT = "recommendation_result.xhtml";
 
     public static String getCaseInstanceURL(String caseInstanceId) {
         return PAGE_CASE_INSTANCE + "?caseInstanceId=" + caseInstanceId;
