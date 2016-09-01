@@ -20,9 +20,19 @@ import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.chart.LegendPlacement;
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.MenuElement;
+import org.primefaces.model.menu.MenuModel;
+import org.shitstorm.model.RecommendationGoalResultRow;
+import wsclient.generated.prescriptiverecommender.ExpectedValue;
+import wsclient.generated.prescriptiverecommender.GoalRequest;
+import wsclient.generated.prescriptiverecommender.KipGoal;
+import wsclient.generated.prescriptiverecommender.NextActionRecommendation;
 import wsclient.generated.prescriptiverecommender.NextBestAction;
 import wsclient.generated.prescriptiverecommender.SequenceRecommendation;
 import wsclient.generated.prescriptiverecommender.SimAct;
+import wsclient.generated.prescriptiverecommender.SimGoal;
 import wsclient.generated.prescriptiverecommender.SimPeriod;
 
 /**
@@ -40,45 +50,56 @@ public class RecommendationResultController implements Serializable {
 
     private List<SimPeriod> simulationValues;
     private BarChartModel barChartModel;
+    private NextActionRecommendation nextRecommendedAction;
+    private SequenceRecommendation sequenceRecommendation;
+    private MenuModel menuModel;
 
     public RecommendationResultController() {
         this.barChartModel = new BarChartModel();
         this.simulationValues = new ArrayList<>();
+        //this.simulationValues.get(0).getSimActValues().get(0).getSimGoalValues().get(0).getExpectedValue().
     }
 
     @PostConstruct
     private void initialize() {
-        NextBestAction nextRecommendedAction = recommendationController.getActionRecommendation().getNextRecommendedAction();
-        SequenceRecommendation sequenceRecommendation = recommendationController.getSequenceRecommendation();
-
+        this.nextRecommendedAction = recommendationController.getActionRecommendation();
+        this.sequenceRecommendation = recommendationController.getSequenceRecommendation();
         if (nextRecommendedAction != null) {
-            this.simulationValues.add(nextRecommendedAction.getSimPeriod());
+            this.simulationValues.add(nextRecommendedAction.getNextRecommendedAction().getSimPeriod());
         } else if (sequenceRecommendation != null) {
             List<NextBestAction> actions = sequenceRecommendation.getNextBestActions();
             for (NextBestAction action : actions) {
                 this.simulationValues.add(action.getSimPeriod());
             }
+            this.initializeMenuModel();
         }
         this.initializeBarModel();
+        
+        
     }
-
-    @PreDestroy
-    private void destroy() {
-        this.barChartModel = null;
-        this.recommendationController.setActionRecommendation(null);
-        this.recommendationController.setSequenceRecommendation(null);
-        this.simulationValues.clear();
+    
+    private MenuModel initializeMenuModel(){
+        this.menuModel = new DefaultMenuModel();
+        if(this.sequenceRecommendation!=null){
+            List<NextBestAction> nextBestActions = this.sequenceRecommendation.getNextBestActions();
+            for (NextBestAction nextBestAction : nextBestActions) {
+                String itemName = nextBestAction.getTaskNameForAction();
+                DefaultMenuItem item = new DefaultMenuItem(itemName);
+                this.menuModel.addElement(item);
+            }
+        }
+        return this.menuModel;
     }
 
     private BarChartModel initializeBarModel() {
         this.barChartModel = new BarChartModel();
         this.barChartModel.setTitle("Bar Chart");
-        this.barChartModel.setLegendPosition("s");
+        this.barChartModel.setLegendPosition("n");
         this.barChartModel.setLegendPlacement(LegendPlacement.OUTSIDEGRID);
-         
+
         Axis xAxis = this.barChartModel.getAxis(AxisType.X);
         xAxis.setLabel("Decision Period");
-         
+
         Axis yAxis = this.barChartModel.getAxis(AxisType.Y);
         yAxis.setLabel("Benefit");
         TreeMap<String, ChartSeries> act2ChartSeries = new TreeMap<>();
@@ -94,10 +115,37 @@ public class RecommendationResultController implements Serializable {
             }
         }
         Collection<ChartSeries> values = act2ChartSeries.values();
-        for(ChartSeries chartSerie : values){
+        for (ChartSeries chartSerie : values) {
             this.barChartModel.addSeries(chartSerie);
         }
         return this.barChartModel;
+    }
+
+    public List<RecommendationGoalResultRow> getGoalResultRows(SimAct simAct) {
+        List<GoalRequest> goalRequests = this.recommendationController.getGoals();
+        List<SimGoal> simGoalValues = simAct.getSimGoalValues();
+        List<RecommendationGoalResultRow> rows = new ArrayList<>();
+        for (GoalRequest goalRequest : goalRequests) {
+            String goalFigure = goalRequest.getGoalFigure();
+            ExpectedValue expectedValue = null;
+            double percentageWeight = 0;
+            for (SimGoal simGoal : simGoalValues) {
+                KipGoal kipGoal = simGoal.getKipGoal();
+                if (kipGoal.getGoalTarget().equals(goalFigure)) {
+                    expectedValue = simGoal.getExpectedValue();
+                    percentageWeight = simGoal.getKipGoal().getGoalWeight();
+                    break;
+                }
+            }
+            RecommendationGoalResultRow row = new RecommendationGoalResultRow(goalRequest, expectedValue, percentageWeight);
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    @PreDestroy
+    private void destroy() {
+       int x = 0;
     }
 
     public List<SimPeriod> getSimulationValues() {
@@ -114,6 +162,14 @@ public class RecommendationResultController implements Serializable {
 
     public void setBarChartModel(BarChartModel barChartModel) {
         this.barChartModel = barChartModel;
+    }
+
+    public MenuModel getMenuModel() {
+        return menuModel;
+    }
+
+    public void setMenuModel(MenuModel menuModel) {
+        this.menuModel = menuModel;
     }
 
 }

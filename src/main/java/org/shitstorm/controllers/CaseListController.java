@@ -7,6 +7,8 @@ package org.shitstorm.controllers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -14,7 +16,6 @@ import javax.inject.Named;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.primefaces.util.Constants;
 import org.shitstorm.constants.ApplicationConstants;
 import org.shitstorm.model.CaseInformationRow;
 
@@ -54,10 +55,13 @@ public class CaseListController implements Serializable {
                         .getVariable(caseInstanceId, ApplicationConstants.VAR_STAKEHOLDER_POWER);
                 String reason = (String) this.processEngine.getCaseService()
                         .getVariable(caseInstanceId, ApplicationConstants.VAR_URSACHE);
+                Date created = this.processEngine.getHistoryService().createHistoricCaseInstanceQuery()
+                        .caseInstanceId(caseInstanceId).singleResult().getCreateTime();
                 CaseInformationRow row = new CaseInformationRow(ci, caseDefinition);
                 row.setCustomerSatisfaction(customerSatisfaction);
                 row.setStakeholderPower(stakeholderPower);
                 row.setReason(reason);
+                row.setCreated(created);
                 rows.add(row);
             }
         }

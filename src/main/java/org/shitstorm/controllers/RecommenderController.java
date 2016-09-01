@@ -17,6 +17,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.model.chart.PieChartModel;
+import org.processapp.utilities.beans.interfaces.ICaseInstanceInformationLoader;
 import org.processapp.utilities.beans.interfaces.IPrescriptiveServiceCaller;
 import org.processapp.utilities.exceptions.CaseInstanceNotValidException;
 import org.shitstorm.constants.Pages;
@@ -33,13 +34,14 @@ import wsclient.generated.prescriptiverecommender.SequenceType;
 @SessionScoped
 public class RecommenderController implements Serializable {
 
-    private PieChartModel pieChart;
-
     @Inject
     private CaseController caseController;
 
     @EJB
     private IPrescriptiveServiceCaller service;
+
+    @EJB
+    ICaseInstanceInformationLoader informationLoader;
 
     private List<GoalRequest> goals;
     private final int minPeriod = 0;
@@ -50,6 +52,7 @@ public class RecommenderController implements Serializable {
     private boolean showActionForm;
     private SequenceRecommendation sequenceRecommendation;
     private NextActionRecommendation actionRecommendation;
+    private PieChartModel pieChart;
 
     public RecommenderController() {
         this.nothingActionAllowed = true;
@@ -111,6 +114,7 @@ public class RecommenderController implements Serializable {
 
     public String recommendAction() {
         String caseInstanceId = this.caseController.getCaseInstance().getId();
+        this.sequenceRecommendation = null;
         this.actionRecommendation = this.service.recommendNextAction(caseInstanceId, this.goals, this.nothingActionAllowed);
         if (this.actionRecommendation != null) {
             this.caseController.setCurrentCenterFormName("Recommendation Result:");
@@ -119,12 +123,15 @@ public class RecommenderController implements Serializable {
         return "";
     }
 
-    public void recommendSequence() {
+    public String recommendSequence() {
         try {
             String caseInstanceId = this.caseController.getCaseInstance().getId();
             this.sequenceRecommendation = this.service.recommendSequence(caseInstanceId, sequenceType, this.numberOfDecisions, goals, nothingActionAllowed);
+            this.actionRecommendation = null;
+            return Pages.PAGE_RECOMMENDATION_RESULT;
         } catch (CaseInstanceNotValidException ex) {
             Logger.getLogger(RecommenderController.class.getName()).log(Level.SEVERE, null, ex);
+            return "";
         }
     }
 

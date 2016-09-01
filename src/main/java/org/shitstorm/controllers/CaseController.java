@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -20,6 +21,8 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.processapp.utilities.beans.interfaces.IPrescriptiveServiceCaller;
+import org.processapp.utilities.exceptions.TaskNotValidForInstanceException;
 import org.shitstorm.constants.Pages;
 import org.shitstorm.helper.CaseExecutionHelper;
 
@@ -28,6 +31,9 @@ import org.shitstorm.helper.CaseExecutionHelper;
 public class CaseController implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @EJB
+    private IPrescriptiveServiceCaller prescriptiveService;
 
     private static final String NO_FORM_MESSAGE = "No Form selected!";
 
@@ -118,7 +124,6 @@ public class CaseController implements Serializable {
         String currentCaseInstanceURL = Pages.getCaseInstanceURL(this.caseInstance.getId());
         if (this.selectedExecution != null) {
             String activityName = this.selectedExecution.getActivityName();
-            String activityType = execution.getActivityType();
             this.currentCenterFormName = activityName;
             activityName = activityName.trim().toLowerCase().replaceAll(" ", "_");
 
@@ -141,9 +146,18 @@ public class CaseController implements Serializable {
     }
 
     public void startExecution(CaseExecution execution) {
-        this.engine.getCaseService().manuallyStartCaseExecution(execution.getId());
-
-        this.updateElementsStatus();
+        FacesContext context = FacesContext.getCurrentInstance();
+        try {
+            // Vor dem Starten der , da die präskriptive Lösung die Informationen der aktuellen 
+            // Periode noch mitgeloefert bekommt und diese sonst nicht als Evidenz gesetzt werden können
+            String resultMessage = this.prescriptiveService.registerDecision(execution.getCaseInstanceId(), execution.getActivityId());
+            // Erst danach dei Case Execution starten und die 
+            this.engine.getCaseService().manuallyStartCaseExecution(execution.getId());
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful", resultMessage));
+            this.updateElementsStatus();
+        } catch (TaskNotValidForInstanceException ex) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registration failed:", ex.getMessage()));
+        }
     }
 
     public String completeElement(CaseExecution execution) {

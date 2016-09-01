@@ -15,13 +15,14 @@ and open the template in the editor.
     <ui:composition template="/WEB-INF/templates/template.xhtml">
         <ui:define name="content">
             <h:head>
-                <title>TODO supply a title</title>
+                <title>Case Instance</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </h:head>
             <f:metadata>
                 <f:event type="preRenderView" listener="#{caseController.initCaseByParameters()}" />
             </f:metadata>
             <h:body>
+
                 <h:panelGrid columns="2">
                     <h2>#{caseController.caseDefinition.name}-Instance: #{caseController.caseInstance.caseInstanceId}</h2>
                     <h:form>
@@ -85,9 +86,10 @@ and open the template in the editor.
                             </p:column>
                             <p:column headerText="Actions" >
                                 <h:form>
+                                    <p:growl id="decisionRegistrationResultMessage" showDetail="true" sticky="false" />
                                     <p:commandButton action="#{caseController.startExecution(execution)}" 
                                                      value="Start #{execution.activityType}" 
-                                                     update="tEnabled tActive tCompleted tAvailable"/>
+                                                     update="tEnabled tActive tCompleted tAvailable decisionRegistrationResultMessage"/>
                                 </h:form>
                             </p:column>
                         </p:dataTable>

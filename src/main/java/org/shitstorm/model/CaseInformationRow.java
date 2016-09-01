@@ -5,6 +5,8 @@
  */
 package org.shitstorm.model;
 
+import java.util.Calendar;
+import java.util.Date;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
@@ -19,6 +21,7 @@ public class CaseInformationRow {
     private String customerSatisfaction;
     private String reason;
     private String stakeholderPower;
+    private Date created;
 
     public CaseInformationRow(CaseInstance caseInstance, CaseDefinition caseDefinition) {
         this.caseInstance = caseInstance;
@@ -64,4 +67,15 @@ public class CaseInformationRow {
     public void setCustomerSatisfaction(String customerSatisfaction) {
         this.customerSatisfaction = customerSatisfaction;
     }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    
+
 }

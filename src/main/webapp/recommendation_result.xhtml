@@ -3,16 +3,77 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
     <h:head>
         <title>Recommendation Result</title>
     </h:head>
     <h:body>
         <ui:composition template="case_instance.xhtml">
-            <h:outputText value="Hallo" />
             <ui:define name="recommenderRequestForm">
-                <h:outputText value="Results"/>
+                <p:steps model="#{recommendationResultController.menuModel}"/>
                 <p:chart type="bar" model="#{recommendationResultController.barChartModel}" />
+                <c:forEach var="simPeriod" items="#{recommendationResultController.simulationValues}">
+                    <c:forEach var="simAct" items="#{simPeriod.simActValues}">
+                        
+                        <p:outputPanel deferred="true">
+                            <h3>Simulated Values in period #{simPeriod.period} for action #{simAct.taskNameForAction}</h3>
+                            <p:dataTable var="goalRow" 
+                                         value="#{recommendationResultController.getGoalResultRows(simAct)}" 
+                                         tableStyle="width:auto">
+                                <p:column headerText="Goal Figure">
+                                    <h:outputText value="#{goalRow.goalRequest.goalFigure}"/>
+                                </p:column>
+                                <p:column headerText="Expected Value:">
+                                    <h:outputText value="#{goalRow.expectedValue.unitValue}">
+                                        <o:converter converterId="javax.faces.Number" currencySymbol="#{goalRow.goalRequest.goalUnit}" type="currency" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Goal Value:">
+                                    <h:outputText value="#{goalRow.goalRequest.goalValue}">
+                                        <o:converter converterId="javax.faces.Number" currencySymbol="#{goalRow.goalRequest.goalUnit}" type="currency" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Deviation [%]">
+                                    <h:outputText value="#{goalRow.expectedValue.procentualDeviation}" >
+                                        <f:convertNumber maxFractionDigits="1" groupingUsed="true" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Utility">
+                                    <h:outputText value="#{goalRow.expectedValue.uniformUtility}">
+                                        <f:convertNumber maxFractionDigits="1" groupingUsed="true" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Weight">
+                                    <h:outputText value="#{goalRow.percentageWeight} %" />
+                                </p:column>
+                                <p:column headerText="Weighted Utility">
+                                    <h:outputText value="#{goalRow.weightedUniformValue}" >
+                                        <f:convertNumber maxFractionDigits="1" groupingUsed="true" />
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </p:outputPanel>
+                        <br/>
+                    </c:forEach>
+                    <br/>
+                </c:forEach>
+<!--                <p:dataTable var="simPeriod" value="#{recommendationResultController.simulationValues.get(0)}">
+                    <p:column headerText="Hea">
+                        <h:outputText value="#{goalRequest}" />
+                    </p:column>
+                    <p:column headerText="Hea">
+                        <h:outputText value="#{goalRequest}" />
+                    </p:column>
+                </p:dataTable>-->
+                
+                <!--                
+                                <c:forEach var="simPeriod" items="#{recommendationResultController.simulationValues}">
+                
+                                </c:forEach>-->
             </ui:define>
         </ui:composition>
     </h:body>

@@ -67,8 +67,7 @@
                                                  value="#{recommenderController.nothingActionAllowed}" />
                         <p:commandButton value="Recommend Action" 
                                          onclick="rc()"
-                                         action="#{recommenderController.recommendAction()}"
-                                         icon="ui-icon-refresh" />
+                                         action="#{recommenderController.recommendAction()}"/>
                     </p:panelGrid>
                     
                     <p:panelGrid rendered="#{!recommenderController.showActionForm}" columns="2">
