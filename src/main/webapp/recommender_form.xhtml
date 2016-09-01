@@ -12,6 +12,55 @@
         <ui:composition template="case_instance.xhtml">
             <ui:define name="recommenderRequestForm">
                 <h:form>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Type of recommendation: " />
+                        <p:inputSwitch value="#{recommenderController.showActionForm}" onLabel="Action" offLabel="Sequence">
+                            <p:ajax update="@form" />
+                        </p:inputSwitch>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2">
+                        <p:panel style="width:380px">
+                            <p:chart type="pie" model="#{recommenderController.pieChart}" style="width: auto" />
+                        </p:panel>
+
+                        <p:panel style="width:auto">
+                            <p:panelGrid rendered="#{recommenderController.showActionForm}" columns="2">
+                                <f:facet name="header">
+                                    <p:row>
+                                        <p:column>Action Recommendation</p:column>
+                                    </p:row>
+                                </f:facet>
+                                <p:outputLabel for="doNothingActionAction" value="Do Nothing-Recommendation allowed" />
+                                <p:selectBooleanCheckbox id="doNothingActionAction" itemLabel="Allowed?"
+                                                         value="#{recommenderController.nothingActionAllowed}" />
+                                <p:commandButton value="Recommend Action" 
+                                                 onclick="rc()"
+                                                 action="#{recommenderController.recommendAction()}"/>
+                            </p:panelGrid>
+                            <p:panelGrid rendered="#{!recommenderController.showActionForm}" columns="2">
+                                <f:facet name="header">
+                                    <p:row>
+                                        <p:column colspan="7">Sequence Recommendation</p:column>
+                                    </p:row>
+                                </f:facet>
+                                <p:outputLabel for="doNothingActionSequence" value="Do Nothing-Recommendation allowed" />
+                                <p:selectBooleanCheckbox id="doNothingActionSequence" itemLabel="Allowed?"
+                                                         value="#{recommenderController.nothingActionAllowed}" />
+                                <p:outputLabel for="sequenceType" value="Sequence Type:" />
+                                <p:selectOneMenu id="sequenceType" value="#{recommenderController.sequenceType}">
+                                    <f:selectItems value="#{recommenderController.sequenceTypes}" />
+                                </p:selectOneMenu>
+                                <p:outputLabel for="numberOfDecisions" value="Number of recommended decisions" />
+                                <p:spinner id="numberOfDecisions" value="#{recommenderController.numberOfDecisions}"
+                                           min="1"
+                                           max="4">
+                                </p:spinner>
+                                <p:commandButton value="Recommend Sequence" 
+                                                 action="#{recommenderController.recommendSequence()}" />
+                            </p:panelGrid>
+                        </p:panel>
+                    </h:panelGrid>
                     <p:dataTable var="goal" value="#{recommenderController.goals}" 
                                  tableStyle="width:auto">
                         <p:column headerText="Goal Figure:">
@@ -48,59 +97,8 @@
                             </p:spinner>
                         </p:column>
                     </p:dataTable>
-                    
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Type of recommendation: " />
-                        <p:inputSwitch value="#{recommenderController.showActionForm}" onLabel="Action" offLabel="Sequence">
-                            <p:ajax update="@form" />
-                        </p:inputSwitch>
-                    </h:panelGrid>
-
-                    <p:panelGrid rendered="#{recommenderController.showActionForm}" columns="2">
-                        <f:facet name="header">
-                            <p:row>
-                                <p:column>Action Recommendation</p:column>
-                            </p:row>
-                        </f:facet>
-                        <p:outputLabel for="doNothingActionAction" value="Do Nothing-Recommendation allowed" />
-                        <p:selectBooleanCheckbox id="doNothingActionAction" itemLabel="Allowed?"
-                                                 value="#{recommenderController.nothingActionAllowed}" />
-                        <p:commandButton value="Recommend Action" 
-                                         onclick="rc()"
-                                         action="#{recommenderController.recommendAction()}"/>
-                    </p:panelGrid>
-                    
-                    <p:panelGrid rendered="#{!recommenderController.showActionForm}" columns="2">
-                        <f:facet name="header">
-                            <p:row>
-                                <p:column colspan="7">Sequence Recommendation</p:column>
-                            </p:row>
-                        </f:facet>
-                        <p:outputLabel for="doNothingActionSequence" value="Do Nothing-Recommendation allowed" />
-                        <p:selectBooleanCheckbox id="doNothingActionSequence" itemLabel="Allowed?"
-                                                 value="#{recommenderController.nothingActionAllowed}" />
-                        <p:outputLabel for="sequenceType" value="Sequence Type:" />
-                        <p:selectOneMenu id="sequenceType" value="#{recommenderController.sequenceType}">
-                            <f:selectItems value="#{recommenderController.sequenceTypes}" />
-                        </p:selectOneMenu>
-                        <p:outputLabel for="numberOfDecisions" value="Number of recommended decisions" />
-                        <p:spinner id="numberOfDecisions" value="#{recommenderController.numberOfDecisions}"
-                                   min="1"
-                                   max="4">
-                        </p:spinner>
-                        <p:commandButton value="Recommend Sequence" 
-                                         action="#{recommenderController.recommendSequence()}" />
-                    </p:panelGrid>
 
 
-                    <!--                    <p:panelGrid columns="2">
-                                            <p:panel style="width:100%;">-->
-                    <p:chart type="pie" model="#{recommenderController.pieChart}" style="width: auto" />
-                    <!--                        </p:panel>
-                                            <p:panel style="width:100%;">
-                                                <h:outputText value="Content" /> 
-                                            </p:panel>
-                                        </p:panelGrid>-->
 
                 </h:form>
 

@@ -14,13 +14,17 @@
     <h:body>
         <ui:composition template="case_instance.xhtml">
             <ui:define name="recommenderRequestForm">
-                <p:steps model="#{recommendationResultController.menuModel}"/>
+                <p:outputPanel deferred="true">
+                    <h3>Empfohlene Schritte (Reihenfolge):</h3>
+                    <p:steps model="#{recommendationResultController.menuModel}"/>
+                </p:outputPanel>
                 <p:chart type="bar" model="#{recommendationResultController.barChartModel}" />
-                <c:forEach var="simPeriod" items="#{recommendationResultController.simulationValues}">
-                    <c:forEach var="simAct" items="#{simPeriod.simActValues}">
-                        
+                <p:chart type="bar" model="#{recommendationResultController.simpleModel}" />
+                <c:forEach var="nextAction" items="#{recommendationResultController.nextBestActions}">
+                    <c:forEach var="simAct" items="#{nextAction.simPeriod.simActValues}">
+
                         <p:outputPanel deferred="true">
-                            <h3>Simulated Values in period #{simPeriod.period} for action #{simAct.taskNameForAction}</h3>
+                            <h3>Simulated Values in period #{nextAction.simPeriod.period} for action #{simAct.taskNameForAction}</h3>
                             <p:dataTable var="goalRow" 
                                          value="#{recommendationResultController.getGoalResultRows(simAct)}" 
                                          tableStyle="width:auto">
@@ -69,7 +73,7 @@
                         <h:outputText value="#{goalRequest}" />
                     </p:column>
                 </p:dataTable>-->
-                
+
                 <!--                
                                 <c:forEach var="simPeriod" items="#{recommendationResultController.simulationValues}">
                 

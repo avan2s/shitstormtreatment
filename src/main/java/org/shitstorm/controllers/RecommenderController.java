@@ -36,6 +36,9 @@ public class RecommenderController implements Serializable {
 
     @Inject
     private CaseController caseController;
+    
+    @Inject
+    private RecommendationResultController resultController;
 
     @EJB
     private IPrescriptiveServiceCaller service;
@@ -66,6 +69,7 @@ public class RecommenderController implements Serializable {
         goalK.setGoalWeight(20);
         goalK.setGoalStartPeriod(this.minPeriod);
         goalK.setGoalEndPeriod(this.maxPeriod);
+        goalK.setGoalValue(10000);
 
         GoalRequest goalKZ = new GoalRequest();
         goalKZ.setGoalFigure("Kundenzufriedenheit");
@@ -73,6 +77,7 @@ public class RecommenderController implements Serializable {
         goalKZ.setGoalWeight(20);
         goalKZ.setGoalStartPeriod(this.minPeriod);
         goalKZ.setGoalEndPeriod(this.maxPeriod);
+        goalKZ.setGoalValue(15);
 
         GoalRequest goalSP = new GoalRequest();
         goalSP.setGoalFigure("Stakeholder-Power");
@@ -80,6 +85,7 @@ public class RecommenderController implements Serializable {
         goalSP.setGoalWeight(20);
         goalSP.setGoalStartPeriod(this.minPeriod);
         goalSP.setGoalEndPeriod(this.maxPeriod);
+        goalSP.setGoalValue(-10);
 
         GoalRequest goalIG = new GoalRequest();
         goalIG.setGoalFigure("Informationsgewinn");
@@ -87,6 +93,7 @@ public class RecommenderController implements Serializable {
         goalIG.setGoalWeight(20);
         goalIG.setGoalStartPeriod(this.minPeriod);
         goalIG.setGoalEndPeriod(this.maxPeriod);
+        goalIG.setGoalValue(1);
 
         GoalRequest goalZA = new GoalRequest();
         goalZA.setGoalFigure("Zeitaufwand");
@@ -94,6 +101,7 @@ public class RecommenderController implements Serializable {
         goalZA.setGoalWeight(20);
         goalZA.setGoalStartPeriod(this.minPeriod);
         goalZA.setGoalEndPeriod(this.maxPeriod);
+        goalZA.setGoalValue(350);
         this.goals.add(goalK);
         this.goals.add(goalKZ);
         this.goals.add(goalSP);
@@ -114,9 +122,9 @@ public class RecommenderController implements Serializable {
 
     public String recommendAction() {
         String caseInstanceId = this.caseController.getCaseInstance().getId();
-        this.sequenceRecommendation = null;
         this.actionRecommendation = this.service.recommendNextAction(caseInstanceId, this.goals, this.nothingActionAllowed);
         if (this.actionRecommendation != null) {
+            this.resultController.buildActionRecommendationResult();
             this.caseController.setCurrentCenterFormName("Recommendation Result:");
             return Pages.PAGE_RECOMMENDATION_RESULT;
         }
@@ -127,7 +135,7 @@ public class RecommenderController implements Serializable {
         try {
             String caseInstanceId = this.caseController.getCaseInstance().getId();
             this.sequenceRecommendation = this.service.recommendSequence(caseInstanceId, sequenceType, this.numberOfDecisions, goals, nothingActionAllowed);
-            this.actionRecommendation = null;
+            this.resultController.buildSequenceRecommendationResult();
             return Pages.PAGE_RECOMMENDATION_RESULT;
         } catch (CaseInstanceNotValidException ex) {
             Logger.getLogger(RecommenderController.class.getName()).log(Level.SEVERE, null, ex);
