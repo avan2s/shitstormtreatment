@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.BarChartSeries;
 import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.chart.LegendPlacement;
 import org.primefaces.model.menu.DefaultMenuItem;
@@ -83,7 +84,6 @@ public class RecommendationResultController implements Serializable {
     }
 
     public void buildActionRecommendationResult() {
-//        this.simulationValues.clear();
         this.nextBestActions.clear();
         this.nextRecommendedAction = recommendationController.getActionRecommendation();
 //        this.simulationValues.add(nextRecommendedAction.getNextRecommendedAction().getSimPeriod());
@@ -114,29 +114,16 @@ public class RecommendationResultController implements Serializable {
         this.barChartModel = new BarChartModel();
         this.barChartModel.setLegendPosition("n");
         this.barChartModel.setLegendPlacement(LegendPlacement.OUTSIDEGRID);
-//
-//        this.simpleModel = new BarChartModel();
-//        ChartSeries boys = new ChartSeries();
-//        boys.setLabel("Boys");
-//        boys.set("2004", 120);
-//        boys.set("2004", 0);
-//        boys.set("2005", 100);
-//        boys.set("2007", 150);
-//        boys.set("2008", 25);
-//
-//        ChartSeries girls = new ChartSeries();
-//        girls.setLabel("Girls");
-//        girls.set("2004", 52);
-//        girls.set("2005", 60);
-//        girls.set("2006", 110);
-//        girls.set("2007", 135);
-//        girls.set("2008", 120);
-//        this.simpleModel.addSeries(boys);
-//        this.simpleModel.addSeries(girls);
-//        List<ChartSeries> simpleChartSeries = this.simpleModel.getSeries();
-        LinkedHashMap<String, ChartSeries> act2ChartSeries = this.constructDefaultChartSeriesForBarChart();
 
-        // Für jede vorgeschlagene Aktion...
+        LinkedHashMap<String, ChartSeries> act2ChartSeries = this.constructDefaultChartSeriesForBarChart();
+        ChartSeries boys = new ChartSeries();
+        boys.setLabel("Boys");
+        boys.set("0", 120);
+        boys.set("1", 100);
+        boys.set("2", 44);
+        boys.set("3", 150);
+        boys.set("4", 25);
+        // Für jede vorgeschlagene Aktion... (d.h. jedePeriode )
         for (NextBestAction nextBestAction : this.nextBestActions) {
             // Simulationswerte der Periode heraussuchen
             SimPeriod simPeriod = nextBestAction.getSimPeriod();
@@ -169,21 +156,35 @@ public class RecommendationResultController implements Serializable {
         return this.barChartModel;
     }
 
+    private List<String> getAllSimActsInRecommendation() {
+        List<String> actionNames = new ArrayList<>();
+        for (NextBestAction nextAction : this.nextBestActions) {
+            SimPeriod simPeriod = nextAction.getSimPeriod();
+            for (SimAct simAct : simPeriod.getSimActValues()) {
+                if (!actionNames.contains(simAct.getTaskNameForAction())) {
+                    actionNames.add(simAct.getTaskNameForAction());
+                }
+            }
+        }
+        return actionNames;
+    }
+
     private LinkedHashMap<String, ChartSeries> constructDefaultChartSeriesForBarChart() {
         LinkedHashMap<String, ChartSeries> act2ChartSeries = new LinkedHashMap<>();
         if (nextBestActions.size() >= 0) {
-            List<SimAct> allSimActs = this.nextBestActions.get(0).getSimPeriod().getSimActValues();
 
-            for (SimAct simAct : allSimActs) {
+            List<String> allActionsInRecommendation = this.getAllSimActsInRecommendation();
+
+            for (String actionInRecommendation : allActionsInRecommendation) {
                 // Lege eine neue ChartSerie an
-                ChartSeries chartSeries = new ChartSeries(simAct.getTaskNameForAction());
+                ChartSeries chartSeries = new ChartSeries(actionInRecommendation);
                 // Für jede vorgeschlagene Aktion (d.h. jede Periode, die von Interesse ist)
                 // ChartSerie befüllen
                 for (NextBestAction nextBestAction : this.nextBestActions) {
                     // Für jede Periode zu jeder Aktion einen default-Wert festlegen
                     chartSeries.set(String.valueOf(nextBestAction.getPeriod()), 0);
-                    act2ChartSeries.put(simAct.getTaskNameForAction(), chartSeries);
                 }
+                act2ChartSeries.put(actionInRecommendation, chartSeries);
             }
         }
         return act2ChartSeries;
@@ -255,14 +256,6 @@ public class RecommendationResultController implements Serializable {
 
     public void setNextBestActions(List<NextBestAction> nextBestActions) {
         this.nextBestActions = nextBestActions;
-    }
-
-    public BarChartModel getSimpleModel() {
-        return simpleModel;
-    }
-
-    public void setSimpleModel(BarChartModel simpleModel) {
-        this.simpleModel = simpleModel;
     }
 
 }

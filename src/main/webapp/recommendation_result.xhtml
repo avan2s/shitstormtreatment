@@ -19,7 +19,6 @@
                     <p:steps model="#{recommendationResultController.menuModel}"/>
                 </p:outputPanel>
                 <p:chart type="bar" model="#{recommendationResultController.barChartModel}" />
-                <p:chart type="bar" model="#{recommendationResultController.simpleModel}" />
                 <c:forEach var="nextAction" items="#{recommendationResultController.nextBestActions}">
                     <c:forEach var="simAct" items="#{nextAction.simPeriod.simActValues}">
 
